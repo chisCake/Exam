@@ -11,13 +11,11 @@ namespace Exam
 	{
 		public static void Test()
 		{
-			var uber = new Park<Taxi>(new List<Taxi>()
-			{
+			var uber = new Park<Taxi>(
 				new Taxi("1920AB-7", new Location(75.3432, 12.2353, 0)),
 				new Taxi("1432AB-7", new Location(72.1234, 16.1233, 0)),
 				new Taxi("4331AB-7", new Location(71.3243, 15.6543, 0)),
-				new Taxi("3214AB-7", new Location(77.3123, 14.2123, 0))
-			});
+				new Taxi("3214AB-7", new Location(77.3123, 14.2123, 0)));
 
 			Print(uber);
 
@@ -129,7 +127,14 @@ namespace Exam
 				Cars = new List<T>();
 			}
 
+			// Если уже есть какой-нибудь список
 			public Park(IList<T> cars)
+			{
+				Cars = new List<T>(cars);
+			}
+
+			// Если списка нет
+			public Park(params T[] cars)
 			{
 				Cars = new List<T>(cars);
 			}
