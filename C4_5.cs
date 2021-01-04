@@ -37,155 +37,155 @@ namespace Exam
 				Console.WriteLine();
 			}
 		}
-	}
 
-	// Задание 1
-	interface IBill
-	{
-		public int Number { get; }
-	}
-
-	// Задание 2
-	class Bill : IBill
-	{
-		// В этой задаче только это свойство реализует интерфейс IBill
-		public int Number { get; }
-
-		public Bill(int number)
+		// Задание 1
+		interface IBill
 		{
-			// Ограничения
-			if (number == 5 || number == 10 || number == 50 || number == 100)
-				Number = number;
-			else
-				throw new ArgumentException("Valid values for Number: 5, 10, 50, 100");
+			public int Number { get; }
 		}
 
-		// Не по заданию (для теста)
-		public static Bill[] GetRndmCash(int amt)
+		// Задание 2
+		class Bill : IBill
 		{
-			var cash = new List<Bill>();
-			var rndm = new Random();
-			var allowedBills = new int[] { 5, 10, 50, 100 };
-			for (int i = 0; i < amt; i++)
-				cash.Add(new Bill(allowedBills[rndm.Next(0, 4)]));
-			return cash.ToArray();
-		}
-	}
+			// В этой задаче только это свойство реализует интерфейс IBill
+			public int Number { get; }
 
-	// Задание 3
-	class Wallet<T> where T : Bill
-	{
-		public List<T> Cash { get; private set; }
+			public Bill(int number)
+			{
+				// Ограничения
+				if (number == 5 || number == 10 || number == 50 || number == 100)
+					Number = number;
+				else
+					throw new ArgumentException("Valid values for Number: 5, 10, 50, 100");
+			}
 
-		// Можно создать пустой кошелёк
-		public Wallet()
-		{
-			Cash = new List<T>();
-		}
-
-		// А можно сразу чем-то заполнить, либо так
-		public Wallet(params T[] cash)
-		{
-			// Выбросить своё исключение, если кошелёк будет переполнен
-			if (cash.Length > 200)
-				throw new WalletIsFullException("Wallet will be over crowded");
-
-			Cash = new List<T>(cash);
+			// Не по заданию (для теста)
+			public static Bill[] GetRndmCash(int amt)
+			{
+				var cash = new List<Bill>();
+				var rndm = new Random();
+				var allowedBills = new int[] { 5, 10, 50, 100 };
+				for (int i = 0; i < amt; i++)
+					cash.Add(new Bill(allowedBills[rndm.Next(0, 4)]));
+				return cash.ToArray();
+			}
 		}
 
-		// либо так, ниже написано в чём разница
-		public Wallet(IList<T> cash)
+		// Задание 3
+		class Wallet<T> where T : Bill
 		{
-			if (Cash.Count > 200)
-				throw new WalletIsFullException("Wallet will be over crowded");
+			public List<T> Cash { get; private set; }
 
-			Cash = new List<T>(cash);
-		}
+			// Можно создать пустой кошелёк
+			public Wallet()
+			{
+				Cash = new List<T>();
+			}
 
-		// Задание 3 - добавление
-		// Добавление по штучно или массивом, типо Add(new Bill(5), new Bill(10), ...)
-		public void Add(params T[] cash)
-		{
-			// Выбросить своё исключение, если кошелёк будет переполнен
-			if (Cash.Count + cash.Length > 200)
-				throw new WalletIsFullException("Wallet will be over crowded");
+			// А можно сразу чем-то заполнить, либо так
+			public Wallet(params T[] cash)
+			{
+				// Выбросить своё исключение, если кошелёк будет переполнен
+				if (cash.Length > 200)
+					throw new WalletIsFullException("Wallet will be over crowded");
 
-			Cash.AddRange(cash);
-		}
+				Cash = new List<T>(cash);
+			}
 
-		// Добавление добавление коллекцией-списком, типо Add(new List<Bill>() {new Bill(5), new Bill(10)}}
-		public void Add(IList<T> cash)
-		{
-			if (Cash.Count + cash.Count > 200)
-				throw new WalletIsFullException("Wallet will be over crowded");
+			// либо так, ниже написано в чём разница
+			public Wallet(IList<T> cash)
+			{
+				if (Cash.Count > 200)
+					throw new WalletIsFullException("Wallet will be over crowded");
 
-			Cash.AddRange(cash);
-		}
+				Cash = new List<T>(cash);
+			}
 
-		// Задание 3 - удаление (минимального)
-		public T Remove()
-		{
-			// Выбросить своё исключение, если кошелёк пуст
-			if (Cash.Count == 0)
-				throw new WalletIsEmptyException();
+			// Задание 3 - добавление
+			// Добавление по штучно или массивом, типо Add(new Bill(5), new Bill(10), ...)
+			public void Add(params T[] cash)
+			{
+				// Выбросить своё исключение, если кошелёк будет переполнен
+				if (Cash.Count + cash.Length > 200)
+					throw new WalletIsFullException("Wallet will be over crowded");
 
-			// Сортировать по возростанию, взять первый (он же и минимальный)
-			var min = Cash.OrderBy(item => item).First();
-			Cash.Remove(min);
-			return min;
-		}
+				Cash.AddRange(cash);
+			}
 
-		// Задание 4 - вывод кол-ва по опред значениям Number
-		public void DisplayBills()
-		{
-			var bills = Cash.GroupBy(item => item.Number).OrderBy(item => item.Key);
-			foreach (var bill in bills)
-				Console.WriteLine($"Bill {bill.Key}: {bill.Count()}");
-		}
+			// Добавление добавление коллекцией-списком, типо Add(new List<Bill>() {new Bill(5), new Bill(10)}}
+			public void Add(IList<T> cash)
+			{
+				if (Cash.Count + cash.Count > 200)
+					throw new WalletIsFullException("Wallet will be over crowded");
 
-		// Задание 5 - сериализовать wallet в json
-		public static void Serialize(Wallet<T> wallet, string file)
-		{
-			var json = JsonSerializer.Serialize(wallet);
-			using var sw = new StreamWriter(file);
-			sw.Write(json);
-		}
+				Cash.AddRange(cash);
+			}
 
-		// Задание 3 - свои классы ошибок
-		// На самом деле, хоть тут много чего написано, но это можно легко сгенерировать введя
-		// "Exception" и нажав Tab 1-2 раза, останется только имя исключения поменять
-		// (либо сразу, либо выделив MyException и нажав ctrl+r ctrl+r, либо вручную)
+			// Задание 3 - удаление (минимального)
+			public T Remove()
+			{
+				// Выбросить своё исключение, если кошелёк пуст
+				if (Cash.Count == 0)
+					throw new WalletIsEmptyException();
 
-		[Serializable]
-		public class MyException : Exception
-		{
-			public MyException() { }
-			public MyException(string message) : base(message) { }
-			public MyException(string message, Exception inner) : base(message, inner) { }
-			protected MyException(
-			  System.Runtime.Serialization.SerializationInfo info,
-			  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-		}
-		[Serializable]
-		public class WalletIsFullException : Exception
-		{
-			public WalletIsFullException() { }
-			public WalletIsFullException(string message) : base(message) { }
-			public WalletIsFullException(string message, Exception inner) : base(message, inner) { }
-			protected WalletIsFullException(
-			  System.Runtime.Serialization.SerializationInfo info,
-			  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-		}
+				// Сортировать по возростанию, взять первый (он же и минимальный)
+				var min = Cash.OrderBy(item => item).First();
+				Cash.Remove(min);
+				return min;
+			}
 
-		[Serializable]
-		public class WalletIsEmptyException : Exception
-		{
-			public WalletIsEmptyException() { }
-			public WalletIsEmptyException(string message) : base(message) { }
-			public WalletIsEmptyException(string message, Exception inner) : base(message, inner) { }
-			protected WalletIsEmptyException(
-			  System.Runtime.Serialization.SerializationInfo info,
-			  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+			// Задание 4 - вывод кол-ва по опред значениям Number
+			public void DisplayBills()
+			{
+				var bills = Cash.GroupBy(item => item.Number).OrderBy(item => item.Key);
+				foreach (var bill in bills)
+					Console.WriteLine($"Bill {bill.Key}: {bill.Count()}");
+			}
+
+			// Задание 5 - сериализовать wallet в json
+			public static void Serialize(Wallet<T> wallet, string file)
+			{
+				var json = JsonSerializer.Serialize(wallet);
+				using var sw = new StreamWriter(file);
+				sw.Write(json);
+			}
+
+			// Задание 3 - свои классы ошибок
+			// На самом деле, хоть тут много чего написано, но это можно легко сгенерировать введя
+			// "Exception" и нажав Tab 1-2 раза, останется только имя исключения поменять
+			// (либо сразу, либо выделив MyException и нажав ctrl+r ctrl+r, либо вручную)
+
+			[Serializable]
+			public class MyException : Exception
+			{
+				public MyException() { }
+				public MyException(string message) : base(message) { }
+				public MyException(string message, Exception inner) : base(message, inner) { }
+				protected MyException(
+				  System.Runtime.Serialization.SerializationInfo info,
+				  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+			}
+			[Serializable]
+			public class WalletIsFullException : Exception
+			{
+				public WalletIsFullException() { }
+				public WalletIsFullException(string message) : base(message) { }
+				public WalletIsFullException(string message, Exception inner) : base(message, inner) { }
+				protected WalletIsFullException(
+				  System.Runtime.Serialization.SerializationInfo info,
+				  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+			}
+
+			[Serializable]
+			public class WalletIsEmptyException : Exception
+			{
+				public WalletIsEmptyException() { }
+				public WalletIsEmptyException(string message) : base(message) { }
+				public WalletIsEmptyException(string message, Exception inner) : base(message, inner) { }
+				protected WalletIsEmptyException(
+				  System.Runtime.Serialization.SerializationInfo info,
+				  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+			}
 		}
 	}
 }
