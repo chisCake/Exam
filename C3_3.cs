@@ -169,7 +169,7 @@ namespace Exam
 
 	// Задание 3 - расширения
 	// Класс расширения должен находиться в пространстве имён (namespace)!
-	static class SomeStringExtension
+	static class SomeStringExtension3_3
 	{
 		// "C3_3" тут находится только из-за того, что у меня такая структура проекта, чтобы разделять билеты было удобно
 		// Типо на экзе вложенных классов не будет (если в задании не потребуется), т.е. не надо будет так заморачиваться
@@ -177,7 +177,7 @@ namespace Exam
 		//
 		// static void Main() {}
 		// class SomeString {}
-		// static class SomeStringExtension {}
+		// static class SomeStringExtension3_3 {}
 		//
 		public static int CountSpaces(this C3_3.SomeString ss)
 		{
